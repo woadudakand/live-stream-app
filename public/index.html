@@ -6,7 +6,8 @@
     <body>
         <h2>Live Streaming</h2>
         <video id="localVideo" autoplay muted playsinline></video>
-        <video id="remoteVideo" autoplay playsinline></video>
+        <div id="remoteVideo"></div>
+        <video class="remoteVideo" autoplay playsinline></video>
 
         <script src="/socket.io/socket.io.js"></script>
         <script>
@@ -27,7 +28,13 @@
                 });
 
             peerConnection.ontrack = (event) => {
-                remoteVideo.srcObject = event.streams[0];
+                event.streams.map((streams) => {
+                    var video = document.createElement('video');
+                    video.autoplay = true;
+                    video.playsinline = true;
+                    video.srcObject = streams;
+                    remoteVideo.append(video);
+                });
             };
 
             peerConnection.onicecandidate = (event) => {
