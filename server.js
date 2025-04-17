@@ -6,7 +6,7 @@ const options = {
 };
 
 var http = require('https').createServer(options, app);
-const http = require('http');
+
 const { Server } = require('socket.io');
 
 const app = express();
