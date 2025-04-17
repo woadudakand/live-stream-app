@@ -44,11 +44,14 @@
             // Remote track received
             peerConnection.ontrack = (event) => {
                 const remoteStream = event.streams[0];
-                const remoteVideo = document.createElement('video');
-                remoteVideo.srcObject = remoteStream;
-                remoteVideo.autoplay = true;
-                remoteVideo.playsinline = true;
-                remoteVideos.appendChild(remoteVideo);
+                if (event.track.kind == 'video') {
+                    const remoteVideo = document.createElement('video');
+                    remoteVideo.srcObject = remoteStream;
+                    remoteVideo.autoplay = true;
+                    remoteVideo.playsinline = true;
+                    remoteVideo.id = event.track.id;
+                    remoteVideos.append(remoteVideo);
+                }
             };
 
             // ICE candidate
