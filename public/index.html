@@ -2,20 +2,34 @@
 <html>
     <head>
         <title>Live Stream App</title>
+        <style>
+            video {
+                width: 45%;
+                margin: 10px;
+                border: 2px solid #333;
+                border-radius: 10px;
+            }
+            body {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                font-family: sans-serif;
+            }
+        </style>
     </head>
     <body>
         <h2>Live Streaming</h2>
         <video id="localVideo" autoplay muted playsinline></video>
-        <div id="remoteVideo"></div>
-        <video class="remoteVideo" autoplay playsinline></video>
+        <div id="remoteVideos"></div>
 
         <script src="/socket.io/socket.io.js"></script>
         <script>
             const socket = io();
             const localVideo = document.getElementById('localVideo');
-            const remoteVideo = document.getElementById('remoteVideo');
+            const remoteVideos = document.getElementById('remoteVideos');
             const peerConnection = new RTCPeerConnection();
 
+            // Get user media
             navigator.mediaDevices
                 .getUserMedia({ video: true, audio: true })
                 .then((stream) => {
@@ -27,22 +41,24 @@
                         );
                 });
 
+            // Remote track received
             peerConnection.ontrack = (event) => {
-                event.streams.map((streams) => {
-                    var video = document.createElement('video');
-                    video.autoplay = true;
-                    video.playsinline = true;
-                    video.srcObject = streams;
-                    remoteVideo.append(video);
-                });
+                const remoteStream = event.streams[0];
+                const remoteVideo = document.createElement('video');
+                remoteVideo.srcObject = remoteStream;
+                remoteVideo.autoplay = true;
+                remoteVideo.playsinline = true;
+                remoteVideos.appendChild(remoteVideo);
             };
 
+            // ICE candidate
             peerConnection.onicecandidate = (event) => {
                 if (event.candidate) {
                     socket.emit('ice-candidate', event.candidate);
                 }
             };
 
+            // Socket.IO signaling
             socket.on('offer', async (offer) => {
                 await peerConnection.setRemoteDescription(
                     new RTCSessionDescription(offer)
@@ -62,14 +78,12 @@
                 peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
             });
 
-            async function createOffer() {
+            // Initiate offer
+            setTimeout(async () => {
                 const offer = await peerConnection.createOffer();
                 await peerConnection.setLocalDescription(offer);
                 socket.emit('offer', offer);
-            }
-
-            // Initiate connection after a few seconds
-            setTimeout(createOffer, 1000);
+            }, 1000);
         </script>
     </body>
 </html>
