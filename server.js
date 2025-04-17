@@ -7,12 +7,11 @@ const options = {
     ca: fs.readFileSync('/etc/letsencrypt/live/hub.sovware.com/fullchain.pem'), // optional
 };
 
-var http = require('https').createServer(options, app);
-
 const { Server } = require('socket.io');
 
 const app = express();
-const server = http.createServer(app);
+var server = require('https').createServer(options, app);
+
 const io = new Server(server);
 
 app.use(express.static('public'));
