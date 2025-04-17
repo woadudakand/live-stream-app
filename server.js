@@ -1,4 +1,11 @@
 const express = require('express');
+const options = {
+    key: fs.readFileSync('/etc/letsencrypt/live/hub.sovware.com/privkey.pem'),
+    cert: fs.readFileSync('/etc/letsencrypt/live/hub.sovware.com/cert.pem'),
+    ca: fs.readFileSync('/etc/letsencrypt/live/hub.sovware.com/fullchain.pem'), // optional
+};
+
+var http = require('https').createServer(options, app);
 const http = require('http');
 const { Server } = require('socket.io');
 
