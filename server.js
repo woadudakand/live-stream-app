@@ -12,7 +12,12 @@ const { Server } = require('socket.io');
 const app = express();
 var server = require('http').createServer(options, app);
 
-const io = new Server(server);
+const io = require('socket.io')(server, {
+    cors: {
+        origin: '*', // allow all origins
+        methods: ['GET', 'POST'],
+    },
+});
 
 app.use(express.static('public'));
 

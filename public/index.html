@@ -2,10 +2,22 @@
 <html>
     <head>
         <title>Group Call</title>
+        <link
+            href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+            rel="stylesheet"
+        />
+
+        <style>
+            ::-webkit-scrollbar {
+                width: 6px;
+            }
+            ::-webkit-scrollbar-thumb {
+                background-color: #cbd5e0;
+                border-radius: 6px;
+            }
+        </style>
     </head>
     <body>
-        <h2>Group Video Call</h2>
-        <div id="videos"></div>
         <script src="/socket.io/socket.io.js"></script>
         <script src="script.js"></script>
     </body>
