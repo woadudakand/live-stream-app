@@ -1,95 +1,12 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Live Stream App</title>
-        <style>
-            video {
-                width: 45%;
-                margin: 10px;
-                border: 2px solid #333;
-                border-radius: 10px;
-            }
-            body {
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                font-family: sans-serif;
-            }
-        </style>
+        <title>Group Call</title>
     </head>
     <body>
-        <h2>Live Streaming</h2>
-        <video id="localVideo" autoplay muted playsinline></video>
-        <div id="remoteVideos"></div>
-        <button id="offer">Join</button>
-
+        <h2>Group Video Call</h2>
+        <div id="videos"></div>
         <script src="/socket.io/socket.io.js"></script>
-        <script>
-            const socket = io();
-            const localVideo = document.getElementById('localVideo');
-            const remoteVideos = document.getElementById('remoteVideos');
-            const peerConnection = new RTCPeerConnection();
-
-            // Get user media
-            navigator.mediaDevices
-                .getUserMedia({ video: true, audio: true })
-                .then((stream) => {
-                    localVideo.srcObject = stream;
-                    stream
-                        .getTracks()
-                        .forEach((track) =>
-                            peerConnection.addTrack(track, stream)
-                        );
-                });
-
-            // Remote track received
-            peerConnection.ontrack = (event) => {
-                const remoteStream = event.streams[0];
-                if (event.track.kind == 'video') {
-                    const remoteVideo = document.createElement('video');
-                    remoteVideo.srcObject = remoteStream;
-                    remoteVideo.autoplay = true;
-                    remoteVideo.playsinline = true;
-                    remoteVideo.id = event.track.id;
-                    remoteVideos.append(remoteVideo);
-                }
-            };
-
-            // ICE candidate
-            peerConnection.onicecandidate = (event) => {
-                if (event.candidate) {
-                    socket.emit('ice-candidate', event.candidate);
-                }
-            };
-
-            // Socket.IO signaling
-            socket.on('offer', async (offer) => {
-                await peerConnection.setRemoteDescription(
-                    new RTCSessionDescription(offer)
-                );
-                const answer = await peerConnection.createAnswer();
-                await peerConnection.setLocalDescription(answer);
-                socket.emit('answer', answer);
-            });
-
-            socket.on('answer', async (answer) => {
-                await peerConnection.setRemoteDescription(
-                    new RTCSessionDescription(answer)
-                );
-            });
-
-            socket.on('ice-candidate', (candidate) => {
-                peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
-            });
-
-            // Initiate offer
-            document
-                .getElementById('offer')
-                .addEventListener('click', async () => {
-                    const offer = await peerConnection.createOffer();
-                    await peerConnection.setLocalDescription(offer);
-                    socket.emit('offer', offer);
-                });
-        </script>
+        <script src="script.js"></script>
     </body>
 </html>

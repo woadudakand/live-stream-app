@@ -10,29 +10,43 @@ const options = {
 const { Server } = require('socket.io');
 
 const app = express();
-var server = require('https').createServer(options, app);
+var server = require('http').createServer(options, app);
 
 const io = new Server(server);
 
 app.use(express.static('public'));
 
+const rooms = {}; // roomName => [socketId, ...]
+
 io.on('connection', (socket) => {
-    console.log('a user connected');
+    console.log('User connected:', socket.id);
 
-    socket.on('offer', (offer) => {
-        socket.broadcast.emit('offer', offer);
-    });
+    socket.on('join-room', (roomName) => {
+        socket.join(roomName);
+        if (!rooms[roomName]) rooms[roomName] = [];
+        rooms[roomName].push(socket.id);
 
-    socket.on('answer', (answer) => {
-        socket.broadcast.emit('answer', answer);
-    });
+        const others = rooms[roomName].filter((id) => id !== socket.id);
+        socket.emit('all-users', others);
 
-    socket.on('ice-candidate', (candidate) => {
-        socket.broadcast.emit('ice-candidate', candidate);
-    });
+        socket.to(roomName).emit('user-joined', socket.id);
 
-    socket.on('disconnect', () => {
-        console.log('user disconnected');
+        socket.on('send-offer', ({ to, offer }) => {
+            io.to(to).emit('receive-offer', { from: socket.id, offer });
+        });
+
+        socket.on('send-answer', ({ to, answer }) => {
+            io.to(to).emit('receive-answer', { from: socket.id, answer });
+        });
+
+        socket.on('send-ice', ({ to, candidate }) => {
+            io.to(to).emit('receive-ice', { from: socket.id, candidate });
+        });
+
+        socket.on('disconnect', () => {
+            rooms[roomName] = rooms[roomName].filter((id) => id !== socket.id);
+            socket.to(roomName).emit('user-left', socket.id);
+        });
     });
 });
 
