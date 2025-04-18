@@ -2,9 +2,9 @@ const express = require('express');
 const fs = require('fs');
 
 const options = {
-    key: fs.readFileSync('/etc/letsencrypt/live/hub.sovware.com/privkey.pem'),
-    cert: fs.readFileSync('/etc/letsencrypt/live/hub.sovware.com/cert.pem'),
-    ca: fs.readFileSync('/etc/letsencrypt/live/hub.sovware.com/fullchain.pem'), // optional
+    // key: fs.readFileSync('/etc/letsencrypt/live/hub.sovware.com/privkey.pem'),
+    // cert: fs.readFileSync('/etc/letsencrypt/live/hub.sovware.com/cert.pem'),
+    // ca: fs.readFileSync('/etc/letsencrypt/live/hub.sovware.com/fullchain.pem'), // optional
 };
 
 const { Server } = require('socket.io');

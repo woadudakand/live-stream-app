@@ -21,6 +21,7 @@
         <h2>Live Streaming</h2>
         <video id="localVideo" autoplay muted playsinline></video>
         <div id="remoteVideos"></div>
+        <button id="offer">Join</button>
 
         <script src="/socket.io/socket.io.js"></script>
         <script>
@@ -82,11 +83,13 @@
             });
 
             // Initiate offer
-            setTimeout(async () => {
-                const offer = await peerConnection.createOffer();
-                await peerConnection.setLocalDescription(offer);
-                socket.emit('offer', offer);
-            }, 1000);
+            document
+                .getElementById('offer')
+                .addEventListener('click', async () => {
+                    const offer = await peerConnection.createOffer();
+                    await peerConnection.setLocalDescription(offer);
+                    socket.emit('offer', offer);
+                });
         </script>
     </body>
 </html>
