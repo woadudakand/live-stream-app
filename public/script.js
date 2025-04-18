@@ -24,6 +24,7 @@ socket.on('all-users', (users) => {
 
 socket.on('user-joined', (userId) => {
     console.log(`${userId} joined`);
+    createOffer(userId);
 });
 
 socket.on('receive-offer', async ({ from, offer }) => {
