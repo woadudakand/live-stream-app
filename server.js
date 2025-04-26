@@ -53,6 +53,10 @@ io.on('connection', (socket) => {
             socket.to(roomName).emit('user-left', socket.id);
         });
     });
+
+    socket.on('raise-hand', ({ room }) => {
+        socket.to(room).emit('user-raised-hand', socket.id);
+    });
 });
 
 server.listen(3000, () => {
