@@ -57,6 +57,10 @@ io.on('connection', (socket) => {
     socket.on('raise-hand', ({ room }) => {
         socket.to(room).emit('user-raised-hand', socket.id);
     });
+
+    socket.on('send-chat', ({ room, message }) => {
+        socket.to(room).emit('receive-chat', { senderId: socket.id, message });
+    });
 });
 
 server.listen(3000, () => {
