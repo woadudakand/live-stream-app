@@ -37,14 +37,17 @@ io.on('connection', (socket) => {
         socket.to(roomName).emit('user-joined', socket.id);
 
         socket.on('send-offer', ({ to, offer, memberId }) => {
-            io.to(to).emit('receive-offer', { from: socket.id, offer });
+            io.to(to).emit('receive-offer', {
+                from: socket.id,
+                offer,
+                memberId,
+            });
         });
 
         socket.on('send-answer', ({ to, answer }) => {
             io.to(to).emit('receive-answer', {
                 from: socket.id,
                 answer,
-                memberId,
             });
         });
 
