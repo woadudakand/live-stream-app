@@ -65,6 +65,12 @@ io.on('connection', (socket) => {
                 .emit('receive-chat', { senderId: socket.id, message });
         });
 
+        // ✅ Camera toggle handler
+        socket.on('camera-toggled', ({ room, userId, enabled }) => {
+            // Broadcast to everyone else in the room
+            socket.to(room).emit('camera-toggled', { userId, enabled });
+        });
+
         socket.on('disconnect', () => {
             rooms[roomName] = rooms[roomName].filter((id) => id !== socket.id);
             socket.to(roomName).emit('user-left', socket.id);
