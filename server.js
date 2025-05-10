@@ -26,7 +26,7 @@ const rooms = {}; // roomName => [socketId, ...]
 io.on('connection', (socket) => {
     console.log('User connected:', socket.id);
 
-    socket.on('join-room', (roomName) => {
+    socket.on('join-room', ({ roomName, myId }) => {
         socket.join(roomName);
         if (!rooms[roomName]) rooms[roomName] = [];
         rooms[roomName].push(socket.id);
@@ -34,7 +34,9 @@ io.on('connection', (socket) => {
         const others = rooms[roomName].filter((id) => id !== socket.id);
         socket.emit('all-users', others);
 
-        socket.to(roomName).emit('user-joined', socket.id);
+        socket
+            .to(roomName)
+            .emit('user-joined', { userId: socket.id, memberId: myId });
 
         socket.on('send-offer', ({ to, offer, memberId }) => {
             io.to(to).emit('receive-offer', {
