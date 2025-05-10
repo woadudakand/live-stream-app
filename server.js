@@ -71,6 +71,12 @@ io.on('connection', (socket) => {
             socket.to(room).emit('camera-toggled', { userId, enabled });
         });
 
+        // ✅ mute toggle handler
+        socket.on('mute-toggled', ({ room, userId, enabled }) => {
+            // Broadcast to everyone else in the room
+            socket.to(room).emit('mute-toggled', { userId, enabled });
+        });
+
         socket.on('disconnect', () => {
             rooms[roomName] = rooms[roomName].filter((id) => id !== socket.id);
             socket.to(roomName).emit('user-left', socket.id);
